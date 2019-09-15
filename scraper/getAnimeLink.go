@@ -2,15 +2,17 @@ package scraper
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/TakumiOgawa/viewAnimeList/util"
 )
 
 const (
 	seasonURL string = "https://anime.eiga.com/program/season/"
 )
 
-func GetAnimeLink(year, season string) {
+func GetAnimeLink(year, season string) (contentURLArray []string) {
 
 	reqURL := seasonURL + "/" + year + "-" + season
 
@@ -18,13 +20,19 @@ func GetAnimeLink(year, season string) {
 	if err != nil {
 		fmt.Print("url scarapping failed")
 	}
-	selection := doc.Find("#mainContentsWide > div:nth-child(1) > div.articleInner > div > div").Children()
-	for _, node := range selection.Nodes {
-		fmt.Println(node.Data)
-	}
+	// アニメコンテンツの部分のみのdivを取得
+	selection := doc.Find("#mainContentsWide > div:nth-child(1) > div.articleInner > div > div ").Children()
+	fmt.Println(selection.Length())
 
-	// selection.Find("a").Each(func(_ int, s *goquery.Selection) {
-	// 	url, _ := s.Attr("href")
-	// 	fmt.Println(url)
-	// })
+	selection.Find("a").Each(func(_ int, s *goquery.Selection) {
+		url, _ := s.Attr("href")
+		if strings.Contains(url, "program") {
+			contentURLArray = append(contentURLArray, url)
+		}
+
+	})
+
+	contentURLArray = util.RemoveDupInSlice(contentURLArray)
+
+	return
 }

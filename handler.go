@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"log"
 	"os"
 	"strings"
@@ -13,15 +12,6 @@ import (
 	"github.com/nlopes/slack"
 	"github.com/nlopes/slack/slackevents"
 )
-
-var (
-	// ErrNon200Response non 200 status code in response
-	ErrNon200Response = errors.New("Non 200 Response found")
-)
-
-type SlackMessage struct {
-	Text string `json:"text"`
-}
 
 func main() {
 	lambda.Start(handler)

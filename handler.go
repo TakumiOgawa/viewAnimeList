@@ -21,7 +21,7 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 
 	log.Println("method:", request.HTTPMethod, "path:", request.Path, "res:", request.Resource)
 	eventsAPIEvent, _ := slackevents.ParseEvent(json.RawMessage(request.Body),
-		slackevents.OptionVerifyToken(&slackevents.TokenComparator{VerificationToken: "TOKEN"}))
+		slackevents.OptionVerifyToken(&slackevents.TokenComparator{VerificationToken: os.Getenv("V_TOKEN")}))
 
 	if eventsAPIEvent.Type == slackevents.URLVerification {
 		var r *slackevents.ChallengeResponse
@@ -34,7 +34,7 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 		}, nil
 
 		// こっからレスポンス
-		api := slack.New(os.Getenv("SLACK_TOKEN"))
+		api := slack.New(os.Getenv("V_TOKEN"))
 		var season string
 
 		if eventsAPIEvent.Type == slackevents.CallbackEvent {
@@ -63,7 +63,7 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 						outputAnime = outputAnime + anime + "\n"
 					}
 
-					api.PostMessage("TARGET_CHANNEL_ID", slack.MsgOptionText(outputAnime, false))
+					api.PostMessage(os.Getenv("TARGET_CHANNEL_ID"), slack.MsgOptionText(outputAnime, false))
 
 				}
 			}

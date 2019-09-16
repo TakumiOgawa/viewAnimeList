@@ -34,7 +34,7 @@ func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyRespo
 		}, nil
 
 		// こっからレスポンス
-		api := slack.New(os.Getenv("V_TOKEN"))
+		api := slack.New(os.Getenv("BOT_USER_TOKEN"))
 		var season string
 
 		if eventsAPIEvent.Type == slackevents.CallbackEvent {

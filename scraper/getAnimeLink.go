@@ -27,7 +27,7 @@ func GetAnimeLink(year, season string) (contentURLArray []string) {
 	selection.Find("a").Each(func(_ int, s *goquery.Selection) {
 		url, _ := s.Attr("href")
 		if strings.Contains(url, "program") {
-			contentURLArray = append(contentURLArray, url)
+			contentURLArray = append(contentURLArray, "https://anime.eiga.com"+url)
 		}
 
 	})

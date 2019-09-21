@@ -58,6 +58,8 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 		case *slackevents.AppMentionEvent: // Botユーザーへのメンションの場合
 			text := ev.Text
 
+			log.Println(text)
+
 			switch {
 			case strings.Contains(text, "春"):
 				season = "spring"
@@ -71,29 +73,40 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 
 			animeList := scraper.GetAnimeLink(year, season)
 			for _, anime := range animeList {
-				_, _, err := api.PostMessage(os.Getenv("TARGET_CHANNEL_ID"), slack.MsgOptionText(anime, false))
+				_, _, err := api.PostMessage(ev.Channel, slack.MsgOptionText(anime, false))
 				if err != nil {
 					log.Printf("ERROR : %s", err)
+					return events.APIGatewayProxyResponse{
+						Body: "failure",
+						Headers: map[string]string{
+							"Content-Type": "text"},
+						StatusCode: 400,
+					}, nil
 
 				}
 			}
 		case *slackevents.MessageEvent:
-			text := ev.Text
-			if !strings.Contains(text, "メンションつけろやオラ") {
-				reply := "メンションつけろやオラ"
+			log.Println(ev.User)
+			if ev.User != "animelistbot" {
+				reply := "メンションつけろやオラァ"
 				_, _, err := api.PostMessage(os.Getenv("TARGET_CHANNEL_ID"), slack.MsgOptionText(reply, false))
 				if err != nil {
 					log.Printf("ERROR : %s", err)
-
+					return events.APIGatewayProxyResponse{
+						Body: "failure",
+						Headers: map[string]string{
+							"Content-Type": "text"},
+						StatusCode: 400,
+					}, nil
 				}
 			}
 		}
 	}
 
 	return events.APIGatewayProxyResponse{
-		Body: "失敗",
+		Body: "success",
 		Headers: map[string]string{
 			"Content-Type": "text"},
-		StatusCode: 400,
+		StatusCode: 200,
 	}, nil
 }

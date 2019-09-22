@@ -54,11 +54,12 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 		year = strconv.Itoa(time.Now().Year())
 
 		innerEvent := eventsAPIEvent.InnerEvent
+		log.Println(innerEvent.Type + "innerIventType")
 		switch ev := innerEvent.Data.(type) {
 		case *slackevents.AppMentionEvent: // Botユーザーへのメンションの場合
 			text := ev.Text
 
-			log.Println(text)
+			log.Println(text + "text")
 
 			switch {
 			case strings.Contains(text, "春"):
@@ -86,10 +87,34 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 				}
 			}
 		case *slackevents.MessageEvent:
-			log.Println(ev.User)
-			if ev.User != "animelistbot" {
-				reply := "メンションつけろやオラァ"
-				_, _, err := api.PostMessage(os.Getenv("TARGET_CHANNEL_ID"), slack.MsgOptionText(reply, false))
+
+			text := ev.Text
+
+			log.Println(text + "text")
+
+			if ev.ChannelType == "im" {
+				return events.APIGatewayProxyResponse{
+					Body: "event channelType is im",
+					Headers: map[string]string{
+						"Content-Type": "text"},
+					StatusCode: 400,
+				}, nil
+			}
+
+			switch {
+			case strings.Contains(text, "春"):
+				season = "spring"
+			case strings.Contains(text, "夏"):
+				season = "summer"
+			case strings.Contains(text, "秋"):
+				season = "autonum"
+			case strings.Contains(text, "冬"):
+				season = "winter"
+			}
+
+			animeList := scraper.GetAnimeLink(year, season)
+			for _, anime := range animeList {
+				_, _, err := api.PostMessage(os.Getenv("TARGET_CHANNEL_ID"), slack.MsgOptionText(anime, false))
 				if err != nil {
 					log.Printf("ERROR : %s", err)
 					return events.APIGatewayProxyResponse{
@@ -98,6 +123,7 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 							"Content-Type": "text"},
 						StatusCode: 400,
 					}, nil
+
 				}
 			}
 		}

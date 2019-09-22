@@ -14,7 +14,7 @@ const (
 
 func GetAnimeLink(year, season string) (contentURLArray []string) {
 
-	reqURL := seasonURL + "/" + year + "-" + season
+	reqURL := seasonURL + "/" + year + "-" + season + "/"
 
 	doc, err := goquery.NewDocument(reqURL)
 	if err != nil {

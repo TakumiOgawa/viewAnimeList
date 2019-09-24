@@ -64,10 +64,10 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 			switch {
 			case strings.Contains(text, "春"):
 				season = "spring"
-			case strings.Contains(text, "夏"):
+			case strings.Contains(text, "夏"):
 				season = "summer"
 			case strings.Contains(text, "秋"):
-				season = "autonum"
+				season = "autumn"
 			case strings.Contains(text, "冬"):
 				season = "winter"
 			}
